@@ -21,3 +21,9 @@ docker run -p 3306:3306 -name mysql -d mysql -v /tmp/mysql:/var/lib/mysql /sbin/
   * `/sbin/my_init` - Run the init scripts used to kick off long-running processes and other bootstrapping, as per [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker)
   * `--enable-insecure-key` - Enable a generated SSL key so you can SSH into the container, again as per [phusion/baseimage-docker](https://github.com/phusion/baseimage-docker). Generate your own SSH key for production use.
 * If you use this with [fideloper/docker-nginx-php](https://github.com/fideloper/docker-nginx-php), then naming this container via `-name mysql` will allow you to [link it](http://docs.docker.io/en/latest/use/working_with_links_names/) with the web-app.
+
+## Extra
+
+The container is shipped with `ucarp` installed so you can easily create a highly available DB with a cluster of DB and a virtualIP.
+
+TODO: Write examples of VIP configuration
