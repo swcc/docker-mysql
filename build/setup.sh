@@ -1,32 +1,31 @@
 #!/usr/bin/env sh
 
-# If mysql db directory is empty
+# ###############
+# MySQL DB setup if doesn't exist
 if [ ! -f /var/lib/mysql/ibdata1 ]; then
-  
-  /usr/bin/mysql_install_db
-
-  /usr/bin/mysqld_safe > /dev/null 2>&1 &
-  /bin/sleep 2s
-
-  /usr/bin/mysqladmin -u root password 'root'
-  /usr/bin/mysqladmin -u root password 'root'
-  
-  /usr/bin/killall mysqld
-  /bin/sleep 2s
-
+    /usr/bin/mysql_install_db
 fi
 
-# Start Mysql
+# Reset root password to root
+# Allow local access for root user
+/usr/bin/mysqld_safe --skip-grant-tables > /dev/null 2>&1 &
+/bin/sleep 2s
+mysql -uroot mysql -e "UPDATE mysql.user SET Password=PASSWORD('root') WHERE User='root';FLUSH PRIVILEGES;"
+/usr/bin/mysqladmin -uroot -proot shutdown
 /usr/bin/mysqld_safe > /dev/null 2>&1 &
 /bin/sleep 2s
+mysql -uroot -proot mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY 'root';"
+# ###############
 
-# Create Database
-mysql -uroot -proot -e "CREATE DATABASE a_database"
-
+# ###############
+# Create Database dev DB
+mysql -uroot -proot -e "CREATE DATABASE adatabase"
 # Create (unsafe) HelpSpot user, who can connect remotely
-mysql -uroot -proot -e "GRANT ALL PRIVILEGES ON *.* to 'a_user'@'%' IDENTIFIED BY 'a_password';"
+mysql -uroot -proot -e "GRANT ALL PRIVILEGES ON adatabase.* to 'ausername'@'%' IDENTIFIED BY 'apassword';"
+# ###############
 
 # Shutdown MySQL
-mysqladmin -uroot -proot shutdown
+/usr/bin/mysqladmin -uroot -proot shutdown
 
+# Start normal phusion/baseimage init process
 /sbin/my_init
